@@ -3,7 +3,8 @@ import java.net.*;
 import javax.swing.*;
 
 public class ClientUI {
-    public static void main(String[] args) throws Exception {
+
+    public static void main(String[] args) {
 
         JFrame frame = new JFrame("TCP Client Chat");
         frame.setSize(500, 400);
@@ -13,47 +14,51 @@ public class ClientUI {
         JTextArea chatArea = new JTextArea();
         chatArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(chatArea);
-        scrollPane.setBounds(20, 20, 440, 200);
+        scrollPane.setBounds(20, 20, 440, 220);
         frame.add(scrollPane);
 
-        JTextField sendField = new JTextField();
-        sendField.setBounds(20, 240, 300, 30);
-        frame.add(sendField);
+        JTextField messageField = new JTextField();
+        messageField.setBounds(20, 260, 300, 30);
+        frame.add(messageField);
 
         JButton sendBtn = new JButton("Send");
-        sendBtn.setBounds(360, 240, 100, 30);
+        sendBtn.setBounds(350, 260, 100, 30);
         frame.add(sendBtn);
 
         frame.setVisible(true);
 
-        // Connect to server
-        Socket socket = new Socket("127.0.0.1", 5000);
-        chatArea.append("Connected to server\n");
+        try {
+            Socket socket = new Socket("127.0.0.1", 5000);
+            chatArea.append("Connected to server\n");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(
+                    socket.getOutputStream(), true);
 
-        // Listening thread
-        Thread listenerThread = new Thread(() -> {
-            try {
-                String msg;
-                while ((msg = in.readLine()) != null) {
-                    chatArea.append("Server: " + msg + "\n");
+            // Listening thread
+            new Thread(() -> {
+                try {
+                    String msg;
+                    while ((msg = in.readLine()) != null) {
+                        chatArea.append(msg + "\n");
+                    }
+                } catch (IOException e) {
+                    chatArea.append("Disconnected from server\n");
                 }
-            } catch (IOException e) {
-                chatArea.append("Connection closed.\n");
-            }
-        });
-        listenerThread.start();
+            }).start();
 
-        // Send button
-        sendBtn.addActionListener(e -> {
-            String message = sendField.getText();
-            if (!message.isEmpty()) {
-                out.println(message);
-                chatArea.append("Client: " + message + "\n");
-                sendField.setText("");
-            }
-        });
+            // Send button action
+            sendBtn.addActionListener(e -> {
+                String msg = messageField.getText();
+                if (!msg.isEmpty()) {
+                    out.println(msg);
+                    messageField.setText("");
+                }
+            });
+
+        } catch (IOException e) {
+            chatArea.append("Unable to connect to server\n");
+        }
     }
 }
