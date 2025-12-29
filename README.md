@@ -4,19 +4,6 @@ A simple Java-based web application using **Servlets**, **JSP**, and **MySQL** t
 
 ---
 
-## Table of Contents
-
-- [Features](#features)
-- [Technologies](#technologies)
-- [Project Structure](#project-structure)
-- [Database Setup](#database-setup)
-- [How to Run](#how-to-run)
-- [Usage](#usage)
-- [Screenshots](#screenshots)
-- [Author](#author)
-
----
-
 ## Features
 
 - Register a new student with **name**, **email**, and **year**.
